@@ -25,4 +25,8 @@ public class Pet {
 
     @Column(nullable = false)
     private int age;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "household_eircode", nullable = false)
+    private Household household;
 }

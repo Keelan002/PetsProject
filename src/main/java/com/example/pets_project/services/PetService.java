@@ -1,9 +1,11 @@
 package com.example.pets_project.services;
 
 import com.example.pets_project.entities.Pet;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface PetService {
     Pet createPet(Pet pet);
 
