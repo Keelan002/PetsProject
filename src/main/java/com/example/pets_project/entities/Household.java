@@ -2,6 +2,8 @@ package com.example.pets_project.entities;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +13,8 @@ import java.util.List;
 @Table(name = "houseHold")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Household {
     @Id
     private String eircode;

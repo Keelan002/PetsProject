@@ -1,8 +1,12 @@
 package com.example.pets_project.services;
 
+import com.example.pets_project.Exceptions.PetNotFoundException;
+import com.example.pets_project.dto.PetDTO;
 import com.example.pets_project.entities.Pet;
 import com.example.pets_project.repositories.PetRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.pets_project.Exceptions.HandleValidationExceptions;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,16 +16,9 @@ public class PetServiceImpl implements PetService {
 
     private final PetRepository petRepository;
 
+    @Autowired
     public PetServiceImpl(PetRepository petRepository) {
         this.petRepository = petRepository;
-    }
-
-    @Override
-    public Pet createPet(Pet pet) {
-        if (pet.getName() == null || pet.getAnimalType() == null || pet.getBreed() == null) {
-            throw new IllegalArgumentException("Pet details cannot be null");
-        }
-        return petRepository.save(pet);
     }
 
     @Override
@@ -30,58 +27,49 @@ public class PetServiceImpl implements PetService {
     }
 
     @Override
-    public Pet getPetById(Long id) {
-        return petRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Pet with ID " + id + " not found"));
+    public Optional<Pet> getPet(Long id) {
+        return petRepository.findById(id);
     }
 
     @Override
-    public Pet updatePet(Long id, Pet pet) {
-        Pet existingPet = petRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Pet with ID " + id + " not found"));
-
-        existingPet.setName(pet.getName());
-        existingPet.setAnimalType(pet.getAnimalType());
-        existingPet.setBreed(pet.getBreed());
-        existingPet.setAge(pet.getAge());
-
-        return petRepository.save(existingPet);
+    public Pet createPet(PetDTO petDTO) {
+        Pet pet = new Pet();
+        validatePet(pet);
+        pet.setName(petDTO.name());
+        pet.setAnimalType(petDTO.animalType());
+        pet.setBreed(petDTO.breed());
+        pet.setAge(petDTO.age());
+        return petRepository.save(pet);
     }
 
     @Override
-    public void deletePetById(Long id) {
-        if (!petRepository.existsById(id)) {
-            throw new IllegalArgumentException("Pet with ID " + id + " does not exist");
-        }
+    public void deletePet(Long id) {
         petRepository.deleteById(id);
     }
 
     @Override
-    public void deletePetsByName(String name) {
-        List<Pet> pets = petRepository.findByNameIgnoreCase(name);
-        if (pets.isEmpty()) {
-            throw new IllegalArgumentException("No pets found with name " + name);
+    public Pet changePetName(Long id, String name) {
+        Pet pet = petRepository.findById(id)
+                .orElseThrow(() -> new PetNotFoundException("Pet not found with id: " + id));
+        pet.setName(name);
+        return petRepository.save(pet);
+    }
+
+    private void validatePet(Pet pet) {
+        if (pet == null) {
+            throw new HandleValidationExceptions("Pet cannot be null");
         }
-        petRepository.deleteAll(pets);
-    }
-
-    @Override
-    public List<Pet> findPetsByAnimalType(String animalType) {
-        return petRepository.findByAnimalType(animalType);
-    }
-
-    @Override
-    public List<Pet> findPetsByBreed(String breed) {
-        return petRepository.findByBreedOrderByAge(breed);
-    }
-
-    @Override
-    public List<Object[]> getNameAndBreed() {
-        return petRepository.findNameAndBreed();
-    }
-
-    @Override
-    public Object[] getPetStatistics() {
-        return petRepository.findAgeStatistics();
+        if (pet.getName() == null || pet.getName().trim().isEmpty()) {
+            throw new HandleValidationExceptions("Pet name cannot be empty");
+        }
+        if (pet.getAnimalType() == null || pet.getAnimalType().trim().isEmpty()) {
+            throw new HandleValidationExceptions("Animal type cannot be empty");
+        }
+        if (pet.getBreed() == null || pet.getBreed().trim().isEmpty()) {
+            throw new HandleValidationExceptions("Breed cannot be empty");
+        }
+        if (pet.getAge() == 0 || pet.getAge() < 0) {
+            throw new HandleValidationExceptions("Age must be a non-negative number");
+        }
     }
 }

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface HouseholdRepository extends JpaRepository<Pet, String> {
+public interface HouseholdRepository extends JpaRepository<Household, String> {
 
     @Query("SELECT h FROM Household h JOIN FETCH h.pets WHERE h.eircode = :eircode")
     Optional<Household> findByEircodeWithPets(@Param("eircode") String eircode);

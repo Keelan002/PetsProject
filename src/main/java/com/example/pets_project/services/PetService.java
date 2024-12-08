@@ -1,29 +1,20 @@
 package com.example.pets_project.services;
 
+import com.example.pets_project.dto.PetDTO;
 import com.example.pets_project.entities.Pet;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
-@Service
 public interface PetService {
-    Pet createPet(Pet pet);
 
     List<Pet> getAllPets();
 
-    Pet getPetById(Long id);
+    Optional<Pet> getPet(Long id);
 
-    Pet updatePet(Long id, Pet pet);
+    Pet createPet(PetDTO petDTO);
 
-    void deletePetById(Long id);
+    void deletePet(Long id);
 
-    void deletePetsByName(String name);
-
-    List<Pet> findPetsByAnimalType(String animalType);
-
-    List<Pet> findPetsByBreed(String breed);
-
-    List<Object[]> getNameAndBreed();
-
-    Object[] getPetStatistics();
+    Pet changePetName(Long id, String name);
 }
